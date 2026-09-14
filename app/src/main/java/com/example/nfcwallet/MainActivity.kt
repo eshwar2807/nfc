@@ -1,10 +1,12 @@
 package com.example.nfcwallet
 
+import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NfcA
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -65,15 +67,37 @@ class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
 
     override fun onResume() {
         super.onResume()
-        // Reader mode across all card families; keep the platform NDEF check on
-        // so NDEF data is cached and readable in onTagDiscovered.
-        nfcAdapter?.enableReaderMode(
+        val adapter = nfcAdapter
+        if (adapter == null) {
+            statusText.text = "This device has no NFC hardware."
+            return
+        }
+        if (!adapter.isEnabled) {
+            statusText.text = "NFC is turned OFF. Tap here to open NFC settings and enable it."
+            statusText.setOnClickListener {
+                startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+            }
+            return
+        }
+        statusText.setOnClickListener(null)
+        statusText.text = "Ready. Hold the card flat against the UPPER-BACK of the phone " +
+            "(near the top) and hold it still for a second."
+
+        // Reader mode across all card families. Skip the platform NDEF check so
+        // the phone reports the raw tag (UID) even for non-NDEF cards; we read
+        // NDEF ourselves in onTagDiscovered when present. The extras delay the
+        // presence check so a still card isn't dropped instantly.
+        val extras = Bundle().apply {
+            putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 250)
+        }
+        adapter.enableReaderMode(
             this, this,
             NfcAdapter.FLAG_READER_NFC_A or
                 NfcAdapter.FLAG_READER_NFC_B or
                 NfcAdapter.FLAG_READER_NFC_F or
-                NfcAdapter.FLAG_READER_NFC_V,
-            null
+                NfcAdapter.FLAG_READER_NFC_V or
+                NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
+            extras
         )
     }
 
