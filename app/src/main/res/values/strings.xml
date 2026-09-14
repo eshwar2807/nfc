@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NFC Wallet</string>
+    <string name="hce_service_desc">NFC Wallet card emulation</string>
+    <string name="hce_aid_group_desc">Emulated card applications</string>
+</resources>

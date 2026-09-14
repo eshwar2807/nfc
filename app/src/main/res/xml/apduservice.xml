@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/hce_service_desc"
+    android:requireDeviceUnlock="false">
+
+    <!--
+      AID groups the OS routes to this app. The default below is a common
+      NDEF Type-4 tag application (D2760000850101). Add the AID(s) your own
+      reader expects here, then rebuild. AIDs must be 5-16 bytes (hex).
+    -->
+    <aid-group
+        android:category="other"
+        android:description="@string/hce_aid_group_desc">
+        <aid-filter android:name="D2760000850101" />
+        <aid-filter android:name="F0010203040506" />
+    </aid-group>
+</host-apdu-service>
